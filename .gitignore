@@ -1,0 +1,19 @@
+# Java / Maven build files
+**/target/
+*.class
+*.jar
+*.war
+
+# Node / Vite build files
+**/node_modules/
+**/dist/
+**/.vite/
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+
+# OS files
+.DS_Store
+Thumbs.db
