@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -24,12 +26,23 @@ public class User {
     @Column(nullable = false)
     private String role; // e.g., "ADMIN", "TEAM_OWNER"
 
+    @ManyToOne
+    @JoinColumn(name = "team_id")
+    private Team team;
+
     public User() {}
 
     public User(String username, String password, String role) {
         this.username = username;
         this.password = password;
         this.role = role;
+    }
+
+    public User(String username, String password, String role, Team team) {
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.team = team;
     }
 
     // Getters and Setters
@@ -44,4 +57,7 @@ public class User {
 
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
+
+    public Team getTeam() { return team; }
+    public void setTeam(Team team) { this.team = team; }
 }
