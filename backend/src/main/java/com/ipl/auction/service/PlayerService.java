@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.ipl.auction.model.Player;
 import com.ipl.auction.model.Player.PlayerStatus;
@@ -26,10 +27,11 @@ public class PlayerService {
         return playerRepository.findAll();
     }
 
+    @Transactional
     public Player sellPlayer(Long playerId, Long teamId, BigDecimal finalPrice) {
-        Player player = playerRepository.findById(playerId)
+        Player player = playerRepository.findByIdForUpdate(playerId)
                 .orElseThrow(() -> new RuntimeException("Player not found"));
-        Team team = teamRepository.findById(teamId)
+        Team team = teamRepository.findByIdForUpdate(teamId)
                 .orElseThrow(() -> new RuntimeException("Team not found"));
 
         BigDecimal teamBudget = team.getBudget() != null ? team.getBudget() : BigDecimal.ZERO;

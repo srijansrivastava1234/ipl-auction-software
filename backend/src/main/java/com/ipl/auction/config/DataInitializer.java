@@ -3,9 +3,12 @@ package com.ipl.auction.config;
 import com.ipl.auction.model.Player;
 import com.ipl.auction.model.Player.PlayerStatus;
 import com.ipl.auction.model.Team;
+import com.ipl.auction.model.User;
 import com.ipl.auction.repository.PlayerRepository;
 import com.ipl.auction.repository.TeamRepository;
+import com.ipl.auction.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -17,15 +20,21 @@ public class DataInitializer implements CommandLineRunner {
 
     private final TeamRepository teamRepository;
     private final PlayerRepository playerRepository;
+    private final UserRepository userRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
 
-    public DataInitializer(TeamRepository teamRepository, PlayerRepository playerRepository) {
+    public DataInitializer(TeamRepository teamRepository, PlayerRepository playerRepository,
+                           UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
         this.teamRepository = teamRepository;
         this.playerRepository = playerRepository;
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public void run(String... args) throws Exception {
-        // Clear any existing records first
+        // Clear any existing records first (in correct dependency order)
+        userRepository.deleteAll();
         playerRepository.deleteAll();
         teamRepository.deleteAll();
 
@@ -42,9 +51,23 @@ public class DataInitializer implements CommandLineRunner {
             new Team("Lucknow Super Giants", new BigDecimal("1000000000")),
             new Team("Punjab Kings", new BigDecimal("1000000000"))
         );
-        teamRepository.saveAll(iplTeams);
+        List<Team> savedTeams = teamRepository.saveAll(iplTeams);
         System.out.println("=================================================");
         System.out.println("✅ SUCCESSFULLY SEEDED 10 IPL TEAMS!");
+
+        // Seed Users
+        // 1. Seed Admin
+        userRepository.save(new User("admin", passwordEncoder.encode("admin123"), "ADMIN"));
+
+        // 2. Seed Team Owners (mapped to each official team)
+        for (Team team : savedTeams) {
+            String alias = getTeamAlias(team.getName());
+            String username = alias.toLowerCase() + "_owner";
+            String rawPassword = alias.toLowerCase() + "123";
+            userRepository.save(new User(username, passwordEncoder.encode(rawPassword), "TEAM_OWNER", team));
+            System.out.println("   👤 Seeded Owner: " + username + " (password: " + rawPassword + ") for " + team.getName());
+        }
+        System.out.println("✅ SUCCESSFULLY SEEDED AUTHENTICATED USERS!");
 
         // Seed Expanded 23-Player Pool
         List<Player> playerPool = Arrays.asList(
@@ -92,5 +115,21 @@ public class DataInitializer implements CommandLineRunner {
         player.setBasePrice(new BigDecimal(basePriceStr));
         player.setStatus(PlayerStatus.UNSOLD);
         return player;
+    }
+
+    private String getTeamAlias(String teamName) {
+        switch (teamName) {
+            case "Chennai Super Kings": return "CSK";
+            case "Mumbai Indians": return "MI";
+            case "Royal Challengers Bengaluru": return "RCB";
+            case "Kolkata Knight Riders": return "KKR";
+            case "Rajasthan Royals": return "RR";
+            case "Sunrisers Hyderabad": return "SRH";
+            case "Delhi Capitals": return "DC";
+            case "Gujarat Titans": return "GT";
+            case "Lucknow Super Giants": return "LSG";
+            case "Punjab Kings": return "PBKS";
+            default: return "TEAM";
+        }
     }
 }

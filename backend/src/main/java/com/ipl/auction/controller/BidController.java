@@ -1,12 +1,15 @@
 package com.ipl.auction.controller;
 
+import com.ipl.auction.config.TokenUtil;
+import com.ipl.auction.dto.PlaceBidRequest;
 import com.ipl.auction.model.Bid;
 import com.ipl.auction.service.BidService;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
-import java.math.BigDecimal;
 import java.util.Map;
 
 @RestController
@@ -16,27 +19,55 @@ public class BidController {
 
     private final BidService bidService;
     private final SimpMessagingTemplate messagingTemplate;
+    private final TokenUtil tokenUtil;
 
-    public BidController(BidService bidService, SimpMessagingTemplate messagingTemplate) {
+    public BidController(BidService bidService, SimpMessagingTemplate messagingTemplate, TokenUtil tokenUtil) {
         this.bidService = bidService;
         this.messagingTemplate = messagingTemplate;
+        this.tokenUtil = tokenUtil;
     }
 
     @PostMapping
-    public ResponseEntity<?> placeBid(@RequestBody Map<String, Object> payload) {
-        try {
-            Long playerId = Long.parseLong(payload.get("playerId").toString());
-            Long teamId = Long.parseLong(payload.get("teamId").toString());
-            BigDecimal amount = new BigDecimal(payload.get("amount").toString());
+    public ResponseEntity<?> placeBid(
+            @RequestHeader(value = "Authorization", required = false) String authHeader,
+            @Valid @RequestBody PlaceBidRequest request) {
 
-            Bid bid = bidService.placeBid(playerId, teamId, amount);
-
-            // Broadcast real-time update to all connected team devices
-            messagingTemplate.convertAndSend("/topic/bids", bid);
-
-            return ResponseEntity.ok(bid);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(e.getMessage());
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Missing or invalid authorization token"));
         }
+
+        String token = authHeader.substring(7);
+        TokenUtil.UserTokenState tokenState = tokenUtil.validateToken(token);
+        if (tokenState == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid or expired token"));
+        }
+
+        // Rule 1: Only TEAM_OWNER can place bids
+        if (!"TEAM_OWNER".equals(tokenState.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Only team owners can place bids"));
+        }
+
+        // Rule 2: Cannot place bids on behalf of another franchise
+        if (!tokenState.getTeamId().equals(request.getTeamId())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "You cannot place a bid on behalf of another team!"));
+        }
+
+        Bid bid = bidService.placeBid(request.getPlayerId(), request.getTeamId(), request.getAmount());
+
+        // Broadcast real-time update to all connected team devices
+        messagingTemplate.convertAndSend("/topic/bids", bid);
+
+        return ResponseEntity.ok(bid);
+    }
+
+    @GetMapping("/player/{playerId}/highest")
+    public ResponseEntity<?> getHighestBid(@PathVariable Long playerId) {
+        return bidService.getHighestBidForPlayer(playerId)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.noContent().build());
     }
 }
