@@ -1,0 +1,8 @@
+spring:
+  profiles:
+    active: dev
+  application:
+    name: ipl-auction-backend
+
+server:
+  port: 8080
