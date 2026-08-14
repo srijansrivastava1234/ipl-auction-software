@@ -11,25 +11,47 @@ echo.
 
 cd /d "%~dp0"
 
-echo 1. Initializing Git repository...
-git init
-git checkout -b feature/frontend-ui
+:: Ensure Git is in PATH
+set "PATH=%PATH%;C:\Program Files\Git\cmd;C:\Program Files (x86)\Git\cmd;%LocalAppData%\Programs\Git\cmd"
 
-echo 2. Staging all Week 1 files...
+echo 1. Checking Git Installation...
+where git >nul 2>&1
+if %ERRORLEVEL% NEQ 0 (
+    echo [ERROR] Git executable not found in standard paths!
+    echo Please ensure Git is installed at C:\Program Files\Git\cmd\git.exe
+    pause
+    exit /b 1
+)
+
+echo 2. Initializing Git repository...
+git init
+git checkout -b feature/frontend-ui 2>nul || git checkout feature/frontend-ui 2>nul
+
+echo 3. Staging all Week 1 files...
 git add .
 
-echo 3. Creating Git commit...
-git commit -m "feat(frontend): complete Week 1 UI architecture, CSS design system, JWT storage & API interceptor"
+echo 4. Creating Git commit...
+git commit -m "feat(frontend): complete Week 1 UI architecture, CSS design system, JWT storage & API interceptor" 2>nul
 
-echo 4. Adding remote repository...
+echo 5. Adding remote repository...
 git remote remove origin 2>nul
 git remote add origin https://github.com/srijansrivastava1234/ipl-auction-software.git
 
-echo 5. Pushing to GitHub...
+echo 6. Pushing to GitHub...
+echo.
+echo [INFO] A browser or popup window may open to sign in to GitHub...
 git push -u origin feature/frontend-ui
 
 echo.
-echo ===================================================
-echo SUCCESS! Your Week 1 code has been pushed to GitHub.
-echo ===================================================
+if %ERRORLEVEL% EQU 0 (
+    echo ===================================================
+    echo SUCCESS! Your Week 1 code has been pushed to GitHub.
+    echo ===================================================
+) else (
+    echo ===================================================
+    echo PUSH FAILED or CANCELED. Please check your network
+    echo connection or GitHub authorization status.
+    echo ===================================================
+)
 pause
+
