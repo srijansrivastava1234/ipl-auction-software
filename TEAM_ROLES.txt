@@ -1,0 +1,129 @@
+================================================================================
+                       IPL AUCTION SYSTEM - TEAM ROLES & ASSIGNMENTS
+================================================================================
+
+This document outlines the detailed roles, responsibilities, assigned workspace
+directories, and key files for all 5 team members of the IPL Auction System project.
+
+--------------------------------------------------------------------------------
+MEMBER 1: LEAD DEVELOPER & SECURITY ARCHITECT
+--------------------------------------------------------------------------------
+GitHub Handle: @srijansrivastava1234
+Assigned Workspace Folder: /member-1-config
+Actual Code Path: /backend/src/main/java/com/ipl/auction/config/
+
+Role Responsibilities:
+- System Integration: Architect the communication and security protocols between
+  the backend database and frontend client.
+- Security Infrastructure: Manage security filters and token validation rules.
+- Real-Time Messaging Broker: Set up and secure live socket data channels.
+- Build Configuration: Manage maven POM files and server properties.
+
+Key Files Managed:
+- SecurityConfig.java (HTTP security, CORS, CSRF, and endpoint authorizations)
+- TokenAuthenticationFilter.java (JWT extraction and principal loading)
+- TokenUtil.java (HMAC/SHA-256 token generation and validation signatures)
+- WebSocketConfig.java (STOMP WebSocket registry and channel mapping)
+- WebSocketSecurityInterceptor.java (Authentication checks on CONNECT frames)
+- application.properties (Server environment properties and fallback secrets)
+
+--------------------------------------------------------------------------------
+MEMBER 2: BACKEND CONTROLLER & SERVICE APIS ENGINEER
+--------------------------------------------------------------------------------
+GitHub Handle: @amitkumarrajput1133-oss
+Assigned Workspace Folder: /member-2-backend-apis
+Actual Code Paths:
+- /backend/src/main/java/com/ipl/auction/controller/
+- /backend/src/main/java/com/ipl/auction/service/
+- /backend/src/test/java/com/ipl/auction/service/
+
+Role Responsibilities:
+- API Controller Development: Build REST endpoints to handle client HTTP requests.
+- Business Logic Enforcement: Implement strict business rules inside services:
+  - Checking team budgets before allowing bids.
+  - Ensuring the bid is higher than the current highest bid.
+  - Preventing consecutive bids by the same team.
+  - Validating final bidder and price match rules during player finalization.
+- Unit Testing: Maintain and expand JUnit 5 / Mockito unit test suites to guarantee
+  code updates do not break core business flows.
+
+Key Files Managed:
+- BidController.java (Handles place-bid API endpoints)
+- PlayerController.java (Handles player query and finalization endpoints)
+- AuthController.java (Handles authentication login requests)
+- BidService.java (Validates and persists live bidding logic)
+- PlayerService.java (Validates and processes player transaction sales)
+- BidServiceTest.java & PlayerServiceTest.java (Backend Mockito test suites)
+
+--------------------------------------------------------------------------------
+MEMBER 3: DATABASE SCHEMA & JPA REPOSITORIES ENGINEER
+--------------------------------------------------------------------------------
+GitHub Handle: @sharmaakhilesh8273-lgtm
+Assigned Workspace Folder: /member-3-database
+Actual Code Paths:
+- /backend/src/main/java/com/ipl/auction/model/
+- /backend/src/main/java/com/ipl/auction/repository/
+- /backend/src/main/java/com/ipl/auction/config/DataInitializer.java
+
+Role Responsibilities:
+- Database Schema Design: Model the SQL tables and mapping relationships (e.g.
+  one-to-one, many-to-one) using JPA Hibernate annotations.
+- Concurrency Control: Manage database locking strategies to prevent race conditions 
+  when multiple transactions target the same record concurrently.
+- Test Data Seeding: Manage mock database initializer seeds.
+
+Key Files Managed:
+- Player.java, Team.java, User.java, Bid.java, Auction.java (JPA Entities)
+- PlayerRepository.java (Enforces PESSIMISTIC_WRITE locks on player records)
+- TeamRepository.java (Enforces PESSIMISTIC_WRITE locks on team records)
+- UserRepository.java, BidRepository.java, AuctionRepository.java (Data Access layers)
+- DataInitializer.java (Seeds users, official teams, and marquee players)
+
+--------------------------------------------------------------------------------
+MEMBER 4: FRONTEND UI & CSS DESIGNER
+--------------------------------------------------------------------------------
+GitHub Handle: @anshikapandey-bit
+Assigned Workspace Folder: /member-4-frontend-ui
+Actual Code Paths:
+- /frontend/src/components/
+- /frontend/src/index.css
+- /frontend/src/App.css
+
+Role Responsibilities:
+- Modular UI Layouts: Build and style React UI components.
+- Responsive Design: Adapt components for desktop, tablet, and mobile displays.
+- Typography & Polish: Implement unified font systems (Outfit/Space Grotesk), HSL
+  variables, glassmorphism card layouts, transition animations, and glow frames.
+
+Key Files Managed:
+- Login.jsx (Auth card template)
+- PlayerCard.jsx (Active bid and player role badge layout)
+- Leaderboard.jsx (Renders team budget utilization tables and progress fills)
+- BiddingConsole.jsx (Admin navigations and user bidding action panel)
+- FranchiseHeader.jsx (Active user dashboard header)
+- index.css & App.css (Global design system styles)
+
+--------------------------------------------------------------------------------
+MEMBER 5: FRONTEND STATE & WEBSOCKETS HOOKS DEVELOPER
+--------------------------------------------------------------------------------
+GitHub Handle: @suryansh-svg
+Assigned Workspace Folder: /member-5-frontend-sockets
+Actual Code Paths:
+- /frontend/src/App.jsx (Shared Integration)
+- /frontend/src/context/ (Future Authentication context)
+- /frontend/src/hooks/ (Future Custom WebSocket hooks)
+
+Role Responsibilities:
+- Real-Time Integration: Initialize SockJS and STOMP WebSocket connection clients,
+  passing JWT authentication headers on connect commands.
+- Live State Synchronization: Subscribe to WebSocket topics and automatically sync 
+  updates to React local states:
+  - Sync bid changes dynamically on /topic/bids events.
+  - Process final sales and update leaderboard budgets on /topic/players events.
+  - Track active player list index switches on /topic/active-auction events.
+- Cache Management: Manage user session attributes inside browser sessionStorage.
+
+Key Files Managed:
+- App.jsx (Primary frontend controller and socket connector)
+
+================================================================================

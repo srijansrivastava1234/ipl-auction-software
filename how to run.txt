@@ -1,0 +1,30 @@
+step 1
+
+docker-compose up -d
+
+
+step 2
+# 1. Navigate to the backend directory
+cd backend
+
+# 2. Run the Spring Boot application (using the Maven wrapper)
+# If using PowerShell or CMD:
+.\mvnw spring-boot:run
+
+# If using Git Bash or another Unix-like terminal:
+./mvnw spring-boot:run
+
+
+{{{one by one}}}
+
+
+step 3
+
+# 1. Navigate to the frontend directory
+cd frontend
+
+# 2. Install all required packages defined in package.json
+npm install
+
+# 3. Start the Vite development server
+npm run dev
