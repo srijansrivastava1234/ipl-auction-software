@@ -130,6 +130,17 @@ public class PlayerServiceImpl implements PlayerService {
                     + team.getMaxSquadSize() + " reached for team " + team.getShortName());
         }
 
+        // 1b. Validate Overseas Player Cap Constraint (Maximum 8 overseas players allowed per squad)
+        if ("OVERSEAS".equalsIgnoreCase(player.getNationality())) {
+            long overseasCount = team.getPlayers().stream()
+                    .filter(p -> "OVERSEAS".equalsIgnoreCase(p.getNationality()))
+                    .count();
+            if (overseasCount >= 8) {
+                throw new BadRequestException("Cannot purchase player. Team " + team.getShortName() 
+                        + " has already reached the maximum limit of 8 overseas players.");
+            }
+        }
+
         // 2. Validate Base Price vs Purchase Price Constraint
         BigDecimal purchasePrice = purchaseRequest.getPurchasePrice();
         if (purchasePrice.compareTo(player.getBasePrice()) < 0) {
