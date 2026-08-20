@@ -17,6 +17,8 @@ import com.ipl.auction.model.Player.PlayerStatus;
 public interface PlayerRepository extends JpaRepository<Player, Long> {
     List<Player> findByStatus(PlayerStatus status);
     List<Player> findByRole(String role);
+    long countByTeamId(Long teamId);
+    long countByTeamIdAndOverseasTrue(Long teamId);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select p from Player p where p.id = :id")

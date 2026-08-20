@@ -34,6 +34,12 @@ public class Player {
     @Column(nullable = false)
     private PlayerStatus status;
 
+    @Column(nullable = false)
+    private String country = "India";
+
+    @Column(nullable = false)
+    private boolean overseas = false;
+
     @ManyToOne
     @JoinColumn(name = "team_id")
     private Team team;
@@ -50,6 +56,17 @@ public class Player {
         this.role = role;
         this.basePrice = basePrice;
         this.status = status;
+        this.country = "India";
+        this.overseas = false;
+    }
+
+    public Player(String name, String role, BigDecimal basePrice, PlayerStatus status, String country, boolean overseas) {
+        this.name = name;
+        this.role = role;
+        this.basePrice = basePrice;
+        this.status = status;
+        this.country = country;
+        this.overseas = overseas;
     }
 
     // Getters and Setters
@@ -67,6 +84,12 @@ public class Player {
 
     public PlayerStatus getStatus() { return status; }
     public void setStatus(PlayerStatus status) { this.status = status; }
+
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
+
+    public boolean isOverseas() { return overseas; }
+    public void setOverseas(boolean overseas) { this.overseas = overseas; }
 
     public Team getTeam() { return team; }
     public void setTeam(Team team) { this.team = team; }

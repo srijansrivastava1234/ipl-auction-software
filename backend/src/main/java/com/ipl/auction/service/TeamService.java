@@ -24,4 +24,22 @@ public class TeamService {
     public Optional<Team> getTeamById(Long id) {
         return teamRepository.findById(id);
     }
+
+    public Team createTeam(Team team) {
+        return teamRepository.save(team);
+    }
+
+    public Team updateTeam(Long id, Team teamDetails) {
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Team not found with id: " + id));
+        team.setName(teamDetails.getName());
+        team.setBudget(teamDetails.getBudget());
+        return teamRepository.save(team);
+    }
+
+    public void deleteTeam(Long id) {
+        Team team = teamRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Team not found with id: " + id));
+        teamRepository.delete(team);
+    }
 }

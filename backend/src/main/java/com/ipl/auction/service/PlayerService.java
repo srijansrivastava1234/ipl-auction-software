@@ -27,6 +27,41 @@ public class PlayerService {
         return playerRepository.findAll();
     }
 
+    public java.util.Optional<Player> getPlayerById(Long id) {
+        return playerRepository.findById(id);
+    }
+
+    @Transactional
+    public Player createPlayer(Player player) {
+        if (player.getStatus() == null) {
+            player.setStatus(PlayerStatus.UNSOLD);
+        }
+        return playerRepository.save(player);
+    }
+
+    @Transactional
+    public Player updatePlayer(Long id, Player playerDetails) {
+        Player player = playerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Player not found with id: " + id));
+        player.setName(playerDetails.getName());
+        player.setRole(playerDetails.getRole());
+        player.setBasePrice(playerDetails.getBasePrice());
+        player.setStatus(playerDetails.getStatus());
+        player.setCountry(playerDetails.getCountry());
+        player.setOverseas(playerDetails.isOverseas());
+        if (playerDetails.getTeam() != null) {
+            player.setTeam(playerDetails.getTeam());
+        }
+        return playerRepository.save(player);
+    }
+
+    @Transactional
+    public void deletePlayer(Long id) {
+        Player player = playerRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Player not found with id: " + id));
+        playerRepository.delete(player);
+    }
+
     @Transactional
     public Player sellPlayer(Long playerId, Long teamId, BigDecimal finalPrice) {
         Player player = playerRepository.findByIdForUpdate(playerId)
@@ -38,6 +73,20 @@ public class PlayerService {
 
         if (teamBudget.compareTo(finalPrice) < 0) {
             throw new RuntimeException("Team does not have sufficient budget!");
+        }
+
+        // Verify squad limit (maximum 25 players allowed per franchise roster)
+        long currentSquadSize = playerRepository.countByTeamId(teamId);
+        if (currentSquadSize >= 25) {
+            throw new RuntimeException("Team has already reached the maximum squad limit of 25 players!");
+        }
+
+        // Verify overseas quota (maximum 8 overseas players allowed per franchise roster if the player is overseas)
+        if (player.isOverseas()) {
+            long overseasCount = playerRepository.countByTeamIdAndOverseasTrue(teamId);
+            if (overseasCount >= 8) {
+                throw new RuntimeException("Team has already reached the maximum limit of 8 overseas players!");
+            }
         }
 
         // Deduct budget

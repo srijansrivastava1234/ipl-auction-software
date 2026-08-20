@@ -33,6 +33,39 @@ public class PlayerController {
         return playerService.getAllPlayers();
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<Player> getPlayerById(@PathVariable Long id) {
+        return playerService.getPlayerById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping
+    public ResponseEntity<Player> createPlayer(@Valid @RequestBody Player player) {
+        Player created = playerService.createPlayer(player);
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<Player> updatePlayer(@PathVariable Long id, @Valid @RequestBody Player playerDetails) {
+        try {
+            Player updated = playerService.updatePlayer(id, playerDetails);
+            return ResponseEntity.ok(updated);
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deletePlayer(@PathVariable Long id) {
+        try {
+            playerService.deletePlayer(id);
+            return ResponseEntity.ok().build();
+        } catch (RuntimeException ex) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
     @PutMapping("/{id}/sell")
     public ResponseEntity<?> sellPlayer(
             @PathVariable Long id,
