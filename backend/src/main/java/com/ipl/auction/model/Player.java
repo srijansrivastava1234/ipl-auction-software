@@ -30,6 +30,9 @@ public class Player {
     @Column(nullable = false)
     private BigDecimal basePrice;
 
+    @Column(name = "original_base_price")
+    private BigDecimal originalBasePrice;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PlayerStatus status;
@@ -55,6 +58,7 @@ public class Player {
         this.name = name;
         this.role = role;
         this.basePrice = basePrice;
+        this.originalBasePrice = basePrice;
         this.status = status;
         this.country = "India";
         this.overseas = false;
@@ -64,6 +68,7 @@ public class Player {
         this.name = name;
         this.role = role;
         this.basePrice = basePrice;
+        this.originalBasePrice = basePrice;
         this.status = status;
         this.country = country;
         this.overseas = overseas;
@@ -81,6 +86,13 @@ public class Player {
 
     public BigDecimal getBasePrice() { return basePrice; }
     public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; }
+
+    public BigDecimal getOriginalBasePrice() {
+        return originalBasePrice != null ? originalBasePrice : basePrice;
+    }
+    public void setOriginalBasePrice(BigDecimal originalBasePrice) {
+        this.originalBasePrice = originalBasePrice;
+    }
 
     public PlayerStatus getStatus() { return status; }
     public void setStatus(PlayerStatus status) { this.status = status; }
