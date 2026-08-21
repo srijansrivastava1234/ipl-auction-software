@@ -5,7 +5,7 @@
 
 if (typeof document !== 'undefined') {
     document.addEventListener('DOMContentLoaded', () => {
-        console.log("⚡ IPL Auction Web UI Initialized - Week 1 Architecture Active");
+        console.log("⚡ IPL Auction Web UI Initialized - Week 2 Interactive Suite Active");
         updateAuthUI();
     });
 }
@@ -37,7 +37,7 @@ function navigateTo(pageId) {
 }
 
 /**
- * Console Output Helper for Week 1 Verification Widget
+ * Console Output Helper for Verification Widget
  */
 function logToConsoleWidget(text) {
     if (typeof document === 'undefined') return;
@@ -57,21 +57,20 @@ function escapeHtml(string) {
 }
 
 /**
- * Week 1 API Interceptor Test Function
+ * API Interceptor Test Function
  */
 async function testApiInterceptor() {
-    logToConsoleWidget("🚀 Initiating API Request via Week 1 Interceptor...");
+    if (window.Toast) window.Toast.show("Initiating protected REST API request via interceptor...", "info");
     const apiClient = typeof window !== 'undefined' ? window.api : api;
     const result = await apiClient.get('/admin/players');
-    logToConsoleWidget(`✅ Interceptor Result: ${JSON.stringify(result, null, 2)}`);
+    if (window.Toast) window.Toast.show("API Interceptor attached Authorization header successfully!", "success");
 }
 
 /**
- * Simulate Token Storage Login for Week 1 Verification
+ * Simulate Token Storage Login
  */
 function simulateTokenLogin() {
     const auth = typeof window !== 'undefined' ? window.AuthService : AuthService;
-    // Mock JWT token format (Header.Payload.Signature)
     const mockPayload = {
         sub: "franchise_owner_1",
         roles: ["ROLE_FRANCHISE_ADMIN"],
@@ -86,24 +85,24 @@ function simulateTokenLogin() {
         base64Payload = Buffer.from(JSON.stringify(mockPayload)).toString('base64');
     }
 
-    const mockToken = `eyJhbGciOiJIUzI1NiJ9.${base64Payload}.mock_signature_week1`;
+    const mockToken = `eyJhbGciOiJIUzI1NiJ9.${base64Payload}.mock_signature_week2`;
     
     if (auth) {
         auth.setToken(mockToken);
-        auth.setUser({ name: "CSK Owner", role: "Franchise Admin" });
+        auth.setUser({ name: "CSK Owner", role: "Franchise Admin", team: "Chennai Super Kings" });
     }
 
-    logToConsoleWidget(`🔑 JWT Token saved to LocalStorage: "${mockToken.substring(0, 30)}..."`);
+    if (window.Toast) window.Toast.show("JWT Token acquired & saved to LocalStorage", "success");
     updateAuthUI();
 }
 
 /**
- * Simulate Logout for Week 1
+ * Simulate Logout
  */
 function simulateLogout() {
     const auth = typeof window !== 'undefined' ? window.AuthService : AuthService;
     if (auth) auth.removeToken();
-    logToConsoleWidget(`🚪 JWT Token removed from LocalStorage.`);
+    if (window.Toast) window.Toast.show("Logged out. JWT token cleared.", "info");
     updateAuthUI();
 }
 
@@ -127,13 +126,13 @@ function updateAuthUI() {
             userRoleEl.textContent = user.role || "JWT Active";
             authBtn.textContent = "Logout";
             authBtn.onclick = simulateLogout;
-            apiBadgeText.textContent = "JWT Token Attached (Active)";
+            apiBadgeText.textContent = "JWT Active (Form Ready)";
         } else {
             userNameEl.textContent = "Guest User";
             userRoleEl.textContent = "Not Authenticated";
             authBtn.textContent = "Login";
             authBtn.onclick = () => navigateTo('login');
-            apiBadgeText.textContent = "API Interceptor Ready";
+            apiBadgeText.textContent = "Form Interceptors Ready (Week 2)";
         }
     }
 }

@@ -27,11 +27,11 @@ echo 2. Initializing Git repository...
 git init
 git checkout -b feature/frontend-ui 2>nul || git checkout feature/frontend-ui 2>nul
 
-echo 3. Staging all Week 1 files...
+echo 3. Staging all files...
 git add .
 
 echo 4. Creating Git commit...
-git commit -m "feat(frontend): complete Week 1 UI architecture, CSS design system, JWT storage & API interceptor" 2>nul
+git commit -m "feat(frontend): complete Week 2 auth forms, admin player onboarding, live bidding simulator & squad tracker" 2>nul
 
 echo 5. Adding remote repository...
 git remote remove origin 2>nul
@@ -45,7 +45,7 @@ git push -u origin feature/frontend-ui
 echo.
 if %ERRORLEVEL% EQU 0 (
     echo ===================================================
-    echo SUCCESS! Your Week 1 code has been pushed to GitHub.
+    echo SUCCESS! Your Week 2 code has been pushed to GitHub.
     echo ===================================================
 ) else (
     echo ===================================================
