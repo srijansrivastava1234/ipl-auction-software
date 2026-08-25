@@ -135,7 +135,11 @@ class BiddingEngineConcurrencyTest {
         System.out.println("Successful Bids: " + successfulBids.get());
         System.out.println("Rejected Bids (Lock/Increment contention): " + rejectedBids.get());
         System.out.println("Final Player Price: " + finalPlayer.getCurrentBidPrice());
-        System.out.println("Final Winning Team: " + (finalPlayer.getCurrentWinningTeam() != null ? finalPlayer.getCurrentWinningTeam().getShortCode() : "None"));
+        Team winningTeam = null;
+        if (finalPlayer.getCurrentWinningTeam() != null) {
+            winningTeam = teamRepository.findById(finalPlayer.getCurrentWinningTeam().getId()).orElse(null);
+        }
+        System.out.println("Final Winning Team: " + (winningTeam != null ? winningTeam.getShortCode() : "None"));
 
         assertTrue(successfulBids.get() >= 1, "At least one bid must succeed");
         assertEquals(successfulBids.get(), totalRecordedBids, "Total recorded bids in DB must exactly match successful bids");

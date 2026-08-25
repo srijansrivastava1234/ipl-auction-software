@@ -38,3 +38,7 @@ Thumbs.db
 ### Log files ###
 *.log
 logs/
+
+### Frontend Node Modules ###
+node_modules/
+**/node_modules/
