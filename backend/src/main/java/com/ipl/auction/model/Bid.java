@@ -3,6 +3,7 @@ package com.ipl.auction.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -20,14 +21,17 @@ public class Bid {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "player_id")
+    @JoinColumn(name = "player_id", nullable = false)
     private Player player;
 
     @ManyToOne
-    @JoinColumn(name = "team_id")
+    @JoinColumn(name = "team_id", nullable = false)
     private Team team;
 
+    @Column(nullable = false)
     private BigDecimal amount;
+
+    @Column(nullable = false)
     private LocalDateTime bidTime;
 
     public Bid() {}
