@@ -44,14 +44,14 @@ public class BidController {
                     .body(Map.of("error", "Invalid or expired token"));
         }
 
-        // Rule 1: Only TEAM_OWNER can place bids
-        if (!"TEAM_OWNER".equals(tokenState.getRole())) {
+        // Rule 1: Only TEAM_OWNER or ADMIN can place bids
+        if (!"TEAM_OWNER".equals(tokenState.getRole()) && !"ADMIN".equals(tokenState.getRole())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(Map.of("error", "Only team owners can place bids"));
+                    .body(Map.of("error", "Only team owners or auctioneers can place bids"));
         }
 
-        // Rule 2: Cannot place bids on behalf of another franchise
-        if (!tokenState.getTeamId().equals(request.getTeamId())) {
+        // Rule 2: TEAM_OWNER cannot place bids on behalf of another franchise
+        if ("TEAM_OWNER".equals(tokenState.getRole()) && !tokenState.getTeamId().equals(request.getTeamId())) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN)
                     .body(Map.of("error", "You cannot place a bid on behalf of another team!"));
         }

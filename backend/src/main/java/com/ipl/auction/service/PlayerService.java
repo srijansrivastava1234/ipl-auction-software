@@ -100,4 +100,24 @@ public class PlayerService {
 
         return playerRepository.save(player);
     }
+
+    @Transactional
+    public Player markUnsold(Long playerId) {
+        Player player = playerRepository.findByIdForUpdate(playerId)
+                .orElseThrow(() -> new RuntimeException("Player not found"));
+        
+        // If it was previously sold, refund the team's budget
+        if (player.getStatus() == PlayerStatus.SOLD && player.getTeam() != null) {
+            Team team = teamRepository.findByIdForUpdate(player.getTeam().getId())
+                    .orElseThrow(() -> new RuntimeException("Team not found"));
+            team.setBudget(team.getBudget().add(player.getBasePrice()));
+            teamRepository.save(team);
+        }
+
+        player.setTeam(null);
+        player.setStatus(PlayerStatus.UNSOLD);
+        player.setBasePrice(player.getOriginalBasePrice());
+
+        return playerRepository.save(player);
+    }
 }

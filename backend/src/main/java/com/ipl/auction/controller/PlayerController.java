@@ -97,4 +97,35 @@ public class PlayerController {
 
         return ResponseEntity.ok(soldPlayer);
     }
+
+    @PutMapping("/{id}/unsold")
+    public ResponseEntity<?> unsoldPlayer(
+            @PathVariable Long id,
+            @RequestHeader(value = "Authorization", required = false) String authHeader) {
+
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Missing or invalid authorization token"));
+        }
+
+        String token = authHeader.substring(7);
+        TokenUtil.UserTokenState tokenState = tokenUtil.validateToken(token);
+        if (tokenState == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Invalid or expired token"));
+        }
+
+        // Only ADMIN (Auctioneer) can mark unsold
+        if (!"ADMIN".equals(tokenState.getRole())) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                    .body(Map.of("error", "Only the Auctioneer (Admin) can mark a player unsold!"));
+        }
+
+        Player unsoldPlayer = playerService.markUnsold(id);
+
+        // Broadcast real-time player sale/unsold update to all connected devices
+        messagingTemplate.convertAndSend("/topic/players", unsoldPlayer);
+
+        return ResponseEntity.ok(unsoldPlayer);
+    }
 }
