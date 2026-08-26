@@ -32,7 +32,7 @@ public class SecurityConfig {
                 .requestMatchers("/ws-auction/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/auction/active/**").hasRole("ADMIN")
                 .requestMatchers(HttpMethod.PUT, "/api/players/*/sell", "/api/players/*/unsold").hasRole("ADMIN")
-                .requestMatchers(HttpMethod.POST, "/api/bids").hasRole("TEAM_OWNER")
+                .requestMatchers(HttpMethod.POST, "/api/bids").hasAnyRole("TEAM_OWNER", "ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(new TokenAuthenticationFilter(tokenUtil), UsernamePasswordAuthenticationFilter.class);
